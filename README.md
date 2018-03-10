@@ -6,12 +6,13 @@ ssh+mysql online shopping mall
 	
 |Author|浪的飞起|
 |---|---
-|E-mail|410814938@qq.com
+|E-mail|zhng1456@163.com
 
 
 ****
 
 ##FAQ
+
 mysql设置为端口3308,用户名root,密码mysql
 前台入口:http://localhost:8080/sheji_3/InitController/initIndex.do
 
