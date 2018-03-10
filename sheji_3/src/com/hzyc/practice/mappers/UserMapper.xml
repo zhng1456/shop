@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<!-- namespace必须是对应接口的地址 -->
+<mapper namespace="com.hzyc.practice.mappers.UserMapper">
+
+<!-- 查询用户及其订单 -->
+<resultMap type="User" id="selectUserAndOrder">
+<id column="id" property="id"/>
+<result column="username" property="username"/>
+<result column="password" property="password"/>
+<result column="sex" property="sex"/>
+<result column="tel" property="tel"/>
+<collection property="orderList" ofType="Order">
+<id column="orderId" property="id"/>
+<result column="goodId" property="goodId"/>
+</collection>
+</resultMap>
+
+
+<!-- 查询用户及其购买的商品 -->
+<resultMap type="User" id="selectUserAndGood">
+<id column="id" property="id"/>
+<result column="username" property="username"/>
+<result column="password" property="password"/>
+<result column="sex" property="sex"/>
+<result column="tel" property="tel"/>
+<collection property="orderList" ofType="Order">
+<id column="order_id" property="id"/>
+<result column="number" property="number"/>
+<result column="time" property="time"/>
+<association property="good" javaType="Good">
+<result column="name" property="name"/>
+<result column="description" property="description"/>
+</association>
+</collection>
+</resultMap>
+
+
+
+<!-- 查询用户信息和用户对应的订单信息 -->
+<!-- 一个用户对应多个订单信息 -->
+<select id="selectUserAndOrder" resultMap="selectUserAndOrder">
+select u.*,o.id orderId,o.goodId from user u,orders o where u.id = o.userId
+</select>
+<!--查询用户对应的购买商品信息 -->
+<select id="selectUserAndGood" resultMap="selectUserAndGood">
+select u.*,o.id order_id,o.number,o.time,g.`name`,g.description FROM `user` u,orders o,good g where u.id=o.userId and o.goodId=g.id
+</select>
+<!-- 查询所有用户 -->
+<select id="selectAllUser" resultType="User">
+select * from user
+</select>
+<!-- 插入用户 -->
+<insert id="insertUser" parameterType="User">
+insert into user(personName,username,password,sex,tel,pId,cId,address) values(#{personName},#{username},#{password},#{sex},#{tel},#{pId},#{cId},#{address})
+</insert>
+<!-- 查询用户及其地址 -->
+<select id="selectAddressOfUser" parameterType="User" resultType="Address">
+select p.pName province,c.cName city,u.address from user u,province p,city c where u.pId=p.id and u.cId=c.id and u.id=#{id}
+</select>
+</mapper>

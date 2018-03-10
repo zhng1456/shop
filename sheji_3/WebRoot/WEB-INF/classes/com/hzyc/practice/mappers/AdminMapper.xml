@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<!-- namespace必须是对应接口的地址 -->
+<mapper namespace="com.hzyc.practice.mappers.AdminMapper">
+<!-- 查询所有管理员信息 -->
+<select id="selectAdmin" resultType="Admin" parameterType="Admin">
+select * from admin 
+<where>
+<if test="id!=null and id!=''">id=#{id}</if>
+</where>
+</select>
+
+<!-- 插入管理员信息 -->
+<insert id="addAdmin" >
+insert into admin (username,password,email) values (#{username},#{password},#{email})
+</insert>
+
+<!-- 修改管理员信息 -->
+<update id="updateAdmin" parameterType="Admin">
+update admin set username=#{username},password=#{password},email=#{email} where id=#{id}
+</update>
+<!-- 删除单条管理员信息 -->
+<delete id="deleteAdmin" parameterType="Admin">
+delete from admin where id=#{id}
+</delete>
+</mapper>

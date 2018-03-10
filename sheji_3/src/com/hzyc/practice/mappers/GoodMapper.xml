@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<!-- namespace必须是对应接口的地址 -->
+<mapper namespace="com.hzyc.practice.mappers.GoodMapper">
+<insert id="insertGood" parameterType="Good">
+insert into good(name,number,typeId,price,pictureName,description)
+values(#{name},#{number},#{type.id},#{price},#{pictureName},#{description})
+</insert>
+<!-- 查询所有商品,也包括商品中的类别 -->
+<resultMap type="Good" id="GoodAndType">
+<id column="id" property="id"/>
+<result column="name" property="name"/>
+<result column="number" property="number"/>
+<result column="price" property="price"/>
+<result column="pictureName" property="pictureName"/>
+<result column="description" property="description"/>
+<result column="flag" property="flag"/>
+<result column="featured" property="featured"/>
+<association property="type" javaType="Type">
+<id column="gid" property="id"/>
+<result column="gname" property="name"/>
+</association>
+</resultMap>
+<select id="selectAllGood" resultMap="GoodAndType">
+select *,t.id gid,t.name gname from good g,type t where g.typeId=t.id
+and g.flag=1 
+</select>
+
+<!-- 根据id查找 -->
+<select id="selectGoodById" parameterType="int" resultMap="GoodAndType">
+select *,t.id gid,t.name gname from good g,type t where g.typeId=t.id
+and g.id=#{id}
+and g.flag=1
+</select>
+
+<!-- 根据名称模糊查询 -->
+<select id="selectGoodByName" parameterType="String" resultMap="GoodAndType">
+select *,t.id gid,t.name gname from good g,type t where g.typeId=t.id
+<if test="_parameter!='' and _parameter!=null">
+and g.name like "%"#{_parameter}"%"
+</if>
+</select>
+
+<!-- 更新商品 -->
+<update id="updateGood" parameterType="Good">
+update good set name=#{name},typeId=#{type.id},number=#{number},price=#{price},description=#{description},<if test="pictureName!='' and pictureName!=null">pictureName=#{pictureName}</if>
+where id=#{id}
+</update>
+
+<!-- 下架商品 -->
+<update id="downGood" parameterType="Good">
+update good set flag=0
+where id=#{id}
+</update>
+<!--分页查询-->
+<select id="selectPageGood" resultMap="GoodAndType" parameterType="Page">
+select *,t.id gid,t.name gname from good g,type t where g.typeId=t.id
+and g.flag=1 limit #{start},#{perPage} 
+</select>
+
+<!-- 获取总的商品记录数 -->
+<select id="selectAllLength" resultType="int">
+select count(*) from good where flag=1
+</select>
+
+<!-- 根据类别查找商品 -->
+<!-- 还需要分页显示 -->
+<select id="selectGoodByType" resultType="Good" parameterType="Type">
+select * from good where typeId=#{id} limit #{page.start},#{page.perPage}
+</select>
+
+<!--查询某一类别商品的总数量，用于分页的计算  -->
+<select id="selectGoodByTypeLength" resultType="int" parameterType="Type">
+select count(*) from good where typeId=#{id}
+</select>
+
+<!-- 查询最新的6个商品 -->
+<select id="selectLatestGood" resultMap="GoodAndType">
+select *,t.id gid,t.name gname from good g,type t where g.typeId=t.id
+and g.flag=1 order by g.id desc limit 0,6
+</select>
+
+<!-- 查询特色商品即featured=1的商品 -->
+<select id="selectFeaturedGood" resultMap="GoodAndType">
+select *,t.id gid,t.name gname from good g,type t where g.typeId=t.id
+and g.flag=1 and g.featured=1
+</select>
+
+<!--设置某个商品为特色商品  -->
+<update id="setGoodFeatured" parameterType="Good">
+update good set featured=1 where id=#{id}
+</update>
+<!-- 取消某个特色商品 -->
+<update id="cancelGoodFeatured" parameterType="Good">
+update good set featured=0 where id=#{id}
+</update>
+
+<!-- 根据商品名称和类别查询 -->
+<select id="selectGoodByNameAndType" resultType="Good" parameterType="GoodAndType">
+select * from good where name like "%"#{name}"%" and typeId=#{typeId}
+</select>
+</mapper>

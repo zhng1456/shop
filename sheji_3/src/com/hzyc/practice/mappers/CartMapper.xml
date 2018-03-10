@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<!-- namespace必须是对应接口的地址 -->
+<mapper namespace="com.hzyc.practice.mappers.CartMapper">
+<!-- 查询一个用户中的购物车信息，包括商品 -->
+<resultMap type="Cart" id="CartAndGood">
+<id column="userId" property="id"/>
+<association property="user" javaType="User">
+<id column="userId" property="id"/>
+</association>
+<collection property="goodList" ofType="Good">
+<id column="gId" property="id"/>
+<result column="name" property="name"/>
+<result column="price" property="price"/>
+<result column="cartNumber" property="cartNumber"/>
+<result column="cartFlag" property="cartFlag"/>
+<result column="pictureName" property="pictureName"/>
+</collection>
+</resultMap>
+<!-- 插入数据 -->
+<insert id="insertCart" parameterType="SimpleCart">
+insert into cart(userId,goodId,number) values(#{userId},#{goodId},#{cartNumber})
+</insert>
+<!-- 查询某个用户对应 的购物车信息，包括购物车内的商品信息 -->
+<select id="selectCartOfUser" parameterType="User" resultMap="CartAndGood">
+select c.id,c.userId,c.number cartNumber,c.flag cartFlag,g.id gId,g.`name`,g.price,g.pictureName from cart c,good g where c.goodId = g.id and c.userId=#{id} 
+</select>
+<!--查询某用户购物车已经选中的商品用于在订单页显示  -->
+<select id="selectRealCartOfUser" parameterType="User" resultMap="CartAndGood">
+select c.id,c.userId,c.number cartNumber,c.flag cartFlag,g.id gId,g.`name`,g.price,g.pictureName from cart c,good g where c.goodId = g.id and c.userId=#{id} 
+and c.flag=1
+</select>
+<!-- 查询某一商品在某一用户的购物车内是否存在 -->
+<select id="isHaveGoodOfCart" parameterType="SimpleCart" resultType="int">
+select count(*) from cart where userId=#{userId} and goodId=#{goodId}
+</select>
+
+<!-- 购物车中对应商品数量+1 -->
+<update id="cartNumberAdd1" parameterType="SimpleCart">
+update cart set number=number+#{cartNumber} where userId=#{userId} and goodId=#{goodId}
+</update>
+
+<!-- 购物车中对应商品数量-1 -->
+<update id="cartNumberSub1" parameterType="SimpleCart">
+update cart set number=number-1 where userId=#{userId} and goodId=#{goodId}
+</update>
+<!--删除其中的一个商品  -->
+<delete id="removreGoodOfCart" parameterType="SimpleCart">
+delete from cart where userId=#{userId} and goodId=#{goodId}
+</delete>
+<!--插入订单后，删除购物车中对应商品  -->
+<delete id="removreGoodOfCartAfterOrder" parameterType="Cart">
+delete from cart where userId=#{user.id} and goodId in
+(
+	<foreach collection="goodList" item="good" separator=",">
+	#{good.id}
+	</foreach>
+)
+</delete>
+<!--将购物车中的某个商品的状态改为选中  -->
+<update id="confirmGoodOfCart" parameterType="SimpleCart">
+update cart set flag=1 where userId=#{userId} and goodId=#{goodId}
+</update>
+<!-- 将购物车中的某个商品的状态改为不选中 -->
+<update id="cancelGoodOfCart" parameterType="SimpleCart">
+update cart set flag=0 where userId=#{userId} and goodId=#{goodId}
+</update>
+</mapper>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<!-- namespace必须是对应接口的地址 -->
+<mapper namespace="com.hzyc.practice.mappers.CommentMapper">
+
+<resultMap type="Comment" id="CommentAndUser">
+<id column="id" property="id"/>
+<result column="value" property="value"/>
+<result column="time" property="time"/>
+<association property="user" javaType="User">
+<id column="userId" property="id"/>
+<result column="personName" property="personName"/>
+</association>
+</resultMap>
+<!-- 插入一条评论 -->
+<insert id="insertCommet" parameterType="Comment">
+insert into `comment`(userId,goodId,value,time) values(#{userId},#{goodId},#{value},NOW())
+</insert>
+<!-- 查询某一商品的所有评论，用于显示 -->
+<select id="selectCommentByGood" parameterType="Good" resultMap="CommentAndUser">
+SELECT c.id,c.`value`,c.time,u.id userId,u.personName from `comment` c,`user` u WHERE c.userId=u.id AND c.goodId=#{id}
+</select>
+<!-- 判断某个用户能否对一个商品进行评论 -->
+<select id="canComment" parameterType="Comment" resultType="int">
+SELECT DISTINCT o.flag FROM `order` o,detail d WHERE o.id = d.orderId and o.userId=#{userId} AND d.goodId=#{goodId}
+</select>
+</mapper>

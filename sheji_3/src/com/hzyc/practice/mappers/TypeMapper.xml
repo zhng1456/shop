@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<!-- namespace必须是对应接口的地址 -->
+<mapper namespace="com.hzyc.practice.mappers.TypeMapper">
+
+<!-- 查询商品种类 -->
+<select id="selectTypeById" resultType="Type" parameterType="Type">
+select * from type 
+<where>
+flag=1
+<if test="id!=null and id!=''">
+and id=#{id}
+</if>
+</where>
+</select>
+<!-- 分页查询 -->
+<select id="selectPageType" parameterType="Page" resultType="Type">
+select * from type where flag=1
+<if test="currentPage!=0">
+limit #{start},#{perPage}
+</if>
+</select>
+<!-- 插入种类信息 -->
+<insert id="addType" parameterType="Type">
+insert into type (name) values (#{name})
+</insert>
+<!-- 删除种类信息 -->
+<delete id="deleteType" parameterType="Type">
+update  type set flag = 0 where id=#{id}
+</delete>
+<!-- 批量删除种类信息 -->
+<delete id="deleteMulType" parameterType="java.util.List">
+update type set flag=0 where id in (
+<foreach collection="list" item="id" separator=",">
+#{id}
+</foreach>
+)
+</delete>
+<!-- 修改种类信息 -->
+<update id="updateType" parameterType="Type">
+update type set name=#{name} where id=#{id}
+</update>
+
+
+</mapper>

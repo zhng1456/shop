@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<!-- namespace必须是对应接口的地址 -->
+<mapper namespace="com.hzyc.practice.mappers.OrderMapper">
+<resultMap type="Order" id="OrderAndUser">
+<id column="id" property="id"/>
+<result column="flag" property="flag"/>
+<result column="time" property="time"/>
+<result column="money" property="money"/>
+<association property="user" javaType="User">
+<id column="userId" property="id"/>
+<result column="personName" property="personName"/>
+</association>
+</resultMap>
+<!-- 将确认的购物车商品插入为订单 -->
+<insert id="insertOrder" parameterType="Cart">
+insert into `order`(userId,time,money) values(#{user.id},NOW(),#{realTotal})
+</insert>
+<!-- 插入订单的同时，插入此订单的订单详情 -->
+<insert id="insertOrderDetail" parameterType="Cart">
+insert into detail(orderId,goodId,number)
+values
+<foreach collection="goodList" item="good" separator=",">
+(#{orderId},#{good.id},#{good.cartNumber})
+</foreach>
+</insert>
+<select id="selectMaxOrderId" resultType="int">
+select max(id) from `order`
+</select>
+<!-- 将某个订单的状态改为1即已支付 -->
+<update id="payOrder" parameterType="int">
+update `order` set flag=1 where id=#{id}
+</update>
+<!-- 查询该订单信息和该订单对应的用户信息 -->
+<select id="selectAllOrderAndUser" resultMap="OrderAndUser" parameterType="Page">
+select o.id,o.flag,o.time,o.userId,o.money,u.personName from `order` o,user u where o.userId=u.id
+<if test="perPage!=0">limit #{start},#{perPage}</if>
+</select>
+<!-- 根据时间查询 -->
+<select id="selectOrderByTime" resultMap="OrderAndUser" parameterType="TimeInfo">
+select o.id,o.flag,o.time,o.userId,o.money,u.personName from `order` o,user u where o.userId=u.id
+and o.time&gt;=#{start} and o.time&lt;=#{end}
+</select>
+<!-- 查询每一年，每一个月的销售额 -->
+<select id="selectSalesByYear" parameterType="int" resultType="SaleInfo">
+SELECT DATE_FORMAT(time,'%Y-%m') m,count(*) orderNumber,sum(money) monthTotal from `order` WHERE DATE_FORMAT(time,'%Y')=#{year} GROUP BY m
+</select>
+</mapper>

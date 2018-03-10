@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<!-- namespace必须是对应接口的地址 -->
+<mapper namespace="com.hzyc.practice.mappers.AdsMapper">
+<!-- 插入广告图片 -->
+<insert id="insertAds" parameterType="Advertise">
+insert into ads(name) values(#{name})
+</insert>
+
+<!-- 查询广告 -->
+<select id="selectAds" resultType="Advertise">
+select * from ads
+</select>
+<!-- 删除广告 -->
+<delete id="deleteAds" parameterType="Advertise">
+delete from ads where id=#{id}
+</delete>
+</mapper>
