@@ -1,6 +1,7 @@
 # shop
 ssh+mysql online shopping mall
-#ssm+mysql的网上商城系统
+
+# ssm+mysql的网上商城系统
   ssm+mysql的网上商城系统，说明的网站[运行说明](http://blog.csdn.net/qq_31726419/article/details/79492608)
 ****
 	
@@ -11,7 +12,7 @@ ssh+mysql online shopping mall
 
 ****
 
-##FAQ
+## FAQ
 
 mysql设置为端口3308,用户名root,密码mysql
 前台入口:http://localhost:8080/sheji_3/InitController/initIndex.do
